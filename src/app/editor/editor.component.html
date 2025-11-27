@@ -43,6 +43,9 @@
                   <i class="ion-close-round" (click)="removeTag(tag)"></i>
                   {{ tag }}
                 </span>
+                <div class="text-danger" *ngIf="articleForm.get('tagList')?.touched && articleForm.get('tagList')?.errors?.['required']">
+                  At least one tag is required.
+                </div>
               </div>
             </fieldset>
 
