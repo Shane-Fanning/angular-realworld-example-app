@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Article, ArticlesService } from '../core';
@@ -27,7 +27,8 @@ export class EditorComponent implements OnInit {
     this.articleForm = this.fb.group({
       title: '',
       description: '',
-      body: ''
+      body: '',
+      tagList: new FormControl([], Validators.required)
     });
 
     // Initialized tagList as empty array
@@ -54,20 +55,34 @@ export class EditorComponent implements OnInit {
 
   addTag() {
     // retrieve tag control
-    const tag = this.tagField.value;
+    const tag = this.tagField.value?.trim();
+
     // only add tag if it does not exist yet
-    if (this.article.tagList.indexOf(tag) < 0) {
+    if (tag && this.article.tagList.indexOf(tag) < 0) {
       this.article.tagList.push(tag);
     }
     // clear the input
     this.tagField.reset('');
+
+    this.articleForm.get('tagList')?.setValue(this.article.tagList);
+    this.articleForm.get('tagList')?.updateValueAndValidity();
   }
 
   removeTag(tagName: string) {
     this.article.tagList = this.article.tagList.filter(tag => tag !== tagName);
+
+    this.articleForm.get('tagList')?.setValue(this.article.tagList);
+    this.articleForm.get('tagList')?.updateValueAndValidity();
   }
 
   submitForm() {
+    this.addTag();
+    if (this.article.tagList.length === 0) {
+      const tagControl = this.articleForm.get('tagList');
+      tagControl?.markAsTouched();
+      tagControl?.setErrors({ required: true });
+      return;
+    }
     this.isSubmitting = true;
 
     // update the model
