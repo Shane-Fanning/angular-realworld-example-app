@@ -63,7 +63,6 @@ export class EditorComponent implements OnInit {
     }
     // clear the input
     this.tagField.reset('');
-
     this.articleForm.get('tagList')?.setValue(this.article.tagList);
     this.articleForm.get('tagList')?.updateValueAndValidity();
   }
